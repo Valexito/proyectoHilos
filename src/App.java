@@ -22,6 +22,7 @@ public class App {
                 break;
                 
             default:
+            System.out.println("Opción no válida");
                 break;
         }
 

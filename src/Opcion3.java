@@ -18,9 +18,11 @@ public class Opcion3 {
         File archivoProcesado = new File(directorioSalida, nombreArchivo);
 
         if (archivoSinProcesar.exists()) {
-            mostrarContenidoArchivo(archivoSinProcesar);
+            MostrarContenidoArchivoThread thread = new MostrarContenidoArchivoThread(archivoSinProcesar);
+            thread.start();
         } else if (archivoProcesado.exists()) {
-            mostrarContenidoArchivo(archivoProcesado);
+            MostrarContenidoArchivoThread thread = new MostrarContenidoArchivoThread(archivoProcesado);
+            thread.start();
         } else {
             System.out.println("El archivo no se encuentra en los directorios especificados.");
         }
@@ -36,5 +38,18 @@ public class Opcion3 {
             System.err.println("Error leyendo el archivo: " + archivo.getName());
             e.printStackTrace();
         }
+    }
+}
+
+class MostrarContenidoArchivoThread extends Thread {
+    private File archivo;
+
+    public MostrarContenidoArchivoThread(File archivo) {
+        this.archivo = archivo;
+    }
+
+    @Override
+    public void run() {
+        Opcion3.mostrarContenidoArchivo(archivo);
     }
 }

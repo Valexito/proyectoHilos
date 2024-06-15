@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Opcion1 {
+    
     public static void primeraOpcion() {
         Scanner scan = new Scanner(System.in);
         System.out.print("Ingrese la cantidad de archivos a generar: ");
@@ -19,16 +20,36 @@ public class Opcion1 {
             dir.mkdirs();
         }
 
-       
+        Thread[] threads = new Thread[cantidadArchivos];
+        
         for (int i = 0; i < cantidadArchivos; i++) {
             String nombreArchivo = directorio + "/archivo" + (i + 1) + ".txt";
-            generarArchivo(nombreArchivo);
+            threads[i] = new Thread(new GeneradorDeArchivo(nombreArchivo));
+            threads[i].start();
+        }
+
+        for (int i = 0; i < cantidadArchivos; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                System.err.println("Error esperando a que el hilo termine: " + threads[i].getName());
+                e.printStackTrace();
+            }
         }
 
         System.out.println("Archivos generados exitosamente.");
     }
+}
 
-    public static void generarArchivo(String nombreArchivo) {
+class GeneradorDeArchivo implements Runnable {
+    private String nombreArchivo;
+
+    public GeneradorDeArchivo(String nombreArchivo) {
+        this.nombreArchivo = nombreArchivo;
+    }
+
+    @Override
+    public void run() {
         Random random = new Random();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
             for (int i = 0; i < 1000; i++) {

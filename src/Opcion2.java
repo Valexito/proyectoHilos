@@ -23,17 +23,42 @@ public class Opcion2 {
 
         File[] archivos = dirEntrada.listFiles();
         if (archivos != null) {
-            for (File archivo : archivos) {
-                if (archivo.isFile()) {
-                    procesarArchivo(archivo, directorioSalida);
+            ProcesadorDeArchivoThread[] threads = new ProcesadorDeArchivoThread[archivos.length];
+
+            for (int i = 0; i < archivos.length; i++) {
+                if (archivos[i].isFile()) {
+                    threads[i] = new ProcesadorDeArchivoThread(archivos[i], directorioSalida);
+                    threads[i].start();
+                }
+            }
+
+            for (int i = 0; i < archivos.length; i++) {
+                if (archivos[i].isFile()) {
+                    try {
+                        threads[i].join();
+                    } catch (InterruptedException e) {
+                        System.err.println("Error esperando a que el hilo termine: " + threads[i].getName());
+                        e.printStackTrace();
+                    }
                 }
             }
         }
 
         System.out.println("Archivos procesados exitosamente.");
     }
+}
 
-    public static void procesarArchivo(File archivo, String directorioSalida) {
+class ProcesadorDeArchivoThread extends Thread {
+    private File archivo;
+    private String directorioSalida;
+
+    public ProcesadorDeArchivoThread(File archivo, String directorioSalida) {
+        this.archivo = archivo;
+        this.directorioSalida = directorioSalida;
+    }
+
+    @Override
+    public void run() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
         String fechaHora = sdf.format(new Date());
 
@@ -65,9 +90,5 @@ public class Opcion2 {
             System.err.println("Error moviendo el archivo: " + archivo.getName());
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        segundaOpcion();
     }
 }
